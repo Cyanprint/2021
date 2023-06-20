@@ -48,7 +48,7 @@ public class Network {
         Queue<State> queue = new PriorityQueue<>(Comparator.comparingInt(State::totalCost));
         queue.add(new State(startingPositions, 0, new ArrayList<Move>()));
 
-        // Should not approach anywhere near this number
+        // Should not approach anywhere near 2^31 - 1, so no need for longs
         State bestState = new State(startingPositions, Integer.MAX_VALUE, new ArrayList<Move>());
         Map<String, Integer> alreadyProcessed = new HashMap<>();
         while (!queue.isEmpty()) {
@@ -200,7 +200,7 @@ public class Network {
     // Checks if the path from the hallway to the room is clear
     private static boolean checkHallwayClear(int hallPos, int roomPos, int[] occupied) {
         /* Takes the hallway and the room positions, and pulls out all hallway points between the two.
-         * Additionally, by taking a min and a max, it only needs to check from left to right. */
+         * Additionally, by taking the min and a max, it only needs to check from left to right. */
         int min = Math.min(hallPos + 1, roomPos - 5);
         int max = Math.max(hallPos - 1, roomPos - 6);
 
@@ -225,10 +225,8 @@ public class Network {
         // Finds the depth of the burrow, as well as its column.
         int depth = (to - 3) / 4;
         int burrowCol = ((to + 1) % 4) * 2 + 3;
-        // If the amphipod is at the end of either side of the hallway, need to subtract 1.
-        int isOnEnd = (from == 0 || from == 6) ? 1 : 0;
-        // [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] -> need to remove 1 from dist if on ends.
-        int dist = Math.abs(2 * from - burrowCol) + depth - isOnEnd;
+        // Finds the total cost of a move
+        int dist = Math.abs(HALLWAY[from] - burrowCol) + depth;
         int type = getType(unit);
         return MOVE_COSTS[type] * dist;
     }
