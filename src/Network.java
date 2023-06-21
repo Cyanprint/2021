@@ -17,6 +17,7 @@ public class Network {
     private static final int[] MOVE_COSTS = {1, 10, 100, 1000};
     private static int BURROW_DEPTH = 0;
     private static int NUM_AMPHIPODS = 0;
+    private static Frame frame;
 
     public static ArrayList<Move> solvePosition(String filename) {
         List<String> input = new ArrayList<String>();
@@ -45,6 +46,7 @@ public class Network {
             }
         }
 
+        frame = new Frame(startingPositions);
         Queue<State> queue = new PriorityQueue<>(Comparator.comparingInt(State::totalCost));
         queue.add(new State(startingPositions, 0, new ArrayList<Move>()));
 
@@ -245,7 +247,7 @@ public class Network {
             }
             int[] newPositions = Arrays.copyOf(positions, positions.length);
             ArrayList<Move> newMoves = new ArrayList<>(moves);
-            newMoves.add(new Move(from, to));
+            newMoves.add(new Move(unit, from, to));
             newPositions[unit] = position;
             State network = new State(newPositions, totalCost + moveCost, newMoves);
             return network;
@@ -284,16 +286,7 @@ public class Network {
         }
     }
 
-    public record Move(Coordinate from, Coordinate to) {
-        @Override
-        public String toString() {
-            return String.format("[%s - %s]", from, to);
-        }
-    }
-    public record Coordinate(int x, int y) {
-        @Override
-        public String toString() {
-            return String.format("(%d, %d)", x, y);
-        }
-    }
+    public static Frame getFrame() {
+        return frame;
+    } 
 }
